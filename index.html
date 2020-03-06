@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Élection des délégués</title>
+    <style>
+        p {
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="conteneur">
+        <p><input type="btn" value="1er candidat" id="0" class="mybtn" onclick="getId(this.id);" /></p>
+        <p id="1ervote"></p>
+
+
+        <p><input type="btn" value="2eme candidat" id="1" class="mybtn" onclick="getId(this.id);" /></p>
+        <p id="2emevote"></p>
+    </div>
+
+    <div id="votes"></div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        var socket = io.connect('http://localhost:3000');
+
+        var compteur = 0
+        var Clique
+
+        function getId(Id) {
+            Clique = Id;
+        }
+
+        $(window).click(function () {
+            if (compteur % 2 == 0) {
+                compteur++
+                document.getElementById('0').disabled = true
+                document.getElementById('1').disabled = true
+                document.getElementById(Clique).disabled = false
+                socket.emit('plus1', Clique);
+            } else {
+                compteur++
+                document.getElementById('0').disabled = false
+                document.getElementById('1').disabled = false
+                socket.emit('moins1', Clique);
+            }
+        })
+
+        socket.on('vote0', function (nbVotes) {
+            document.getElementById('1ervote').innerHTML = nbVotes + ' votes';
+        })
+        socket.on('1ervote', function (nbVotes) {
+            document.getElementById('2emevote').innerHTML = nbVotes + ' votes';
+        })
+
+    </script>
+</body>
+
+</html>
